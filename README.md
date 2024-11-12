@@ -43,12 +43,13 @@ mvn -version
 docker --version
 ```
 
-```yaml
-Configuração do Banco de Dados
+
+## Configuração do Banco de Dados
 O banco de dados é configurado para rodar no Docker com a imagem oficial do PostgreSQL:
 
 Crie um arquivo docker-compose.yml com o conteúdo abaixo:
 
+```
 yaml
 Copiar código
 version: '3.8'
@@ -67,9 +68,12 @@ services:
 
 volumes:
   postgres_data:
+```
 Execute o seguinte comando para iniciar o banco de dados:
 
+```
 bash
 Copiar código
 docker-compose up -d
 ```
+
