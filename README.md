@@ -41,6 +41,7 @@ Para verificar se você possui as ferramentas instaladas, execute:
 java -version
 mvn -version
 docker --version
+```
 
 ```yaml
 Configuração do Banco de Dados
@@ -71,4 +72,4 @@ Execute o seguinte comando para iniciar o banco de dados:
 bash
 Copiar código
 docker-compose up -d
-'''
+```
