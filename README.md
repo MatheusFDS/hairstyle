@@ -41,3 +41,34 @@ Para verificar se você possui as ferramentas instaladas, execute:
 java -version
 mvn -version
 docker --version
+
+```yaml
+Configuração do Banco de Dados
+O banco de dados é configurado para rodar no Docker com a imagem oficial do PostgreSQL:
+
+Crie um arquivo docker-compose.yml com o conteúdo abaixo:
+
+yaml
+Copiar código
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: hairstyle_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres_data:
+Execute o seguinte comando para iniciar o banco de dados:
+
+bash
+Copiar código
+docker-compose up -d
+'''
