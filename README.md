@@ -51,7 +51,7 @@ Crie um arquivo docker-compose.yml com o conteúdo abaixo:
 
 ```
 yaml
-Copiar código
+
 version: '3.8'
 services:
   postgres:
@@ -72,8 +72,6 @@ volumes:
 Execute o seguinte comando para iniciar o banco de dados:
 
 ```
-bash
-Copiar código
 docker-compose up -d
 ```
 
