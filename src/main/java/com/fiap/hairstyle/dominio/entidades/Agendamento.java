@@ -20,15 +20,15 @@ public class Agendamento {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "servico_id", nullable = false)
     private Servico servico;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "profissional_id", nullable = false)
     private Profissional profissional;
 
