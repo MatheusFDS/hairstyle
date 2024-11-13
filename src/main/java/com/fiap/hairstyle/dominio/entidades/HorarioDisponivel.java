@@ -25,4 +25,5 @@ public class HorarioDisponivel {
 
     private LocalTime horaInicio;
     private LocalTime horaFim;
+
 }

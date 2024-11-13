@@ -1,5 +1,6 @@
 package com.fiap.hairstyle.dominio.entidades;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,15 +23,23 @@ public class Agendamento {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id", nullable = false)
+    @JsonBackReference
     private Cliente cliente;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "servico_id", nullable = false)
+    @JsonBackReference
     private Servico servico;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "profissional_id", nullable = false)
+    @JsonBackReference
     private Profissional profissional;
 
     private LocalDateTime dataHora;
+
+    private boolean naoComparecimento = false;
+
+    // Nova propriedade para o ID do evento no Google Calendar
+    private String googleCalendarEventId;
 }

@@ -36,4 +36,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, UUID> 
     @Query("SELECT a FROM Agendamento a WHERE a.dataHora BETWEEN :inicio AND :fim")
     List<Agendamento> findByDataHoraBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
+    @Query("SELECT a FROM Agendamento a WHERE a.profissional.estabelecimento.id = :estabelecimentoId")
+    List<Agendamento> findByEstabelecimentoId(@Param("estabelecimentoId") UUID estabelecimentoId);
+
 }

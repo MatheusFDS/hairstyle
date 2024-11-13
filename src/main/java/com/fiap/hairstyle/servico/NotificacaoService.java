@@ -54,4 +54,12 @@ public class NotificacaoService {
         System.out.println("Data e Hora: " + agendamento.getDataHora());
         System.out.println("Lembrete: Este é um lembrete para o seu próximo agendamento.");
     }
+
+    public void enviarNaoComparecimento(Agendamento agendamento) {
+        System.out.println("Notificação de Não Comparecimento:");
+        System.out.println("Cliente: " + (agendamento.getCliente() != null ? agendamento.getCliente().getNome() : "Desconhecido"));
+        System.out.println("Serviço: " + (agendamento.getServico() != null ? agendamento.getServico().getNome() : "Desconhecido"));
+        System.out.println("Profissional: " + (agendamento.getProfissional() != null ? agendamento.getProfissional().getNome() : "Desconhecido"));
+        System.out.println("Data e Hora: " + agendamento.getDataHora());
+    }
 }

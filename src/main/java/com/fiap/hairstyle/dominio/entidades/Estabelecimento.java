@@ -1,5 +1,6 @@
 package com.fiap.hairstyle.dominio.entidades;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,15 +27,19 @@ public class Estabelecimento {
     private String horariosFuncionamento;
 
     @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonBackReference
     private List<Profissional> profissionais;
 
     @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonBackReference
     private List<Servico> servicos;
 
     @ElementCollection
     @CollectionTable(name = "estabelecimento_fotos", joinColumns = @JoinColumn(name = "estabelecimento_id"))
     @Column(name = "foto")
     private List<String> fotos;
+
+    @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
+    private List<Avaliacao> avaliacoes;
 }

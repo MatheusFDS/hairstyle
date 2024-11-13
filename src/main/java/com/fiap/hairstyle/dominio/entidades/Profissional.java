@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -29,4 +30,7 @@ public class Profissional {
     @JoinColumn(name = "estabelecimento_id", nullable = false)
     @JsonBackReference
     private Estabelecimento estabelecimento;
+
+    @OneToMany(mappedBy = "profissional", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HorarioDisponivel> horariosDisponiveis;
 }
