@@ -2,7 +2,7 @@ package com.fiap.hairstyle.adaptadores.entrada;
 
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
 import com.fiap.hairstyle.dominio.repositorios.AgendamentoRepository;
-import com.fiap.hairstyle.servico.NotificacaoService;
+import com.fiap.hairstyle.dominio.servico.NotificacaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

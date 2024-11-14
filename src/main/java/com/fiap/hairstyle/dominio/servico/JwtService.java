@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.servico;
+package com.fiap.hairstyle.dominio.servico;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

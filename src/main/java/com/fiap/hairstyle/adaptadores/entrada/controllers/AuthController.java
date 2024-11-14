@@ -1,7 +1,7 @@
 package com.fiap.hairstyle.adaptadores.entrada;
 
 import com.fiap.hairstyle.adaptadores.entrada.requests.LoginRequest;
-import com.fiap.hairstyle.servico.JwtService;
+import com.fiap.hairstyle.dominio.servico.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

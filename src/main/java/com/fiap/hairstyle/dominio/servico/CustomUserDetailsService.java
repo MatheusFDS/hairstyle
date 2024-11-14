@@ -1,7 +1,7 @@
-package com.fiap.hairstyle.servico;
+package com.fiap.hairstyle.dominio.servico;
 
 import com.fiap.hairstyle.dominio.entidades.Usuario;
-import com.fiap.hairstyle.dominio.repositorios.UsuarioRepository;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

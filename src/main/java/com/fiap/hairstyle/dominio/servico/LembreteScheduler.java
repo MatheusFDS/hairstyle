@@ -1,7 +1,7 @@
-package com.fiap.hairstyle.servico;
+package com.fiap.hairstyle.dominio.servico;
 
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
-import com.fiap.hairstyle.dominio.repositorios.AgendamentoRepository;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.AgendamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

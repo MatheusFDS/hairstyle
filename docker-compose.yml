@@ -12,5 +12,24 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: always
 
+  hairstyle-backend:
+    build:
+      context: . # Caminho para o Dockerfile na raiz do projeto
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hairstyle_db
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: docker # Para que o Spring Boot use as configurações do profile 'docker', se houver
+      GOOGLE_APPLICATION_CREDENTIALS: /app/credentials.json # Caminho para credenciais do Google Calendar
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    volumes:
+      - ./credentials.json:/app/credentials.json # Mapeia o arquivo de credenciais
+    restart: always
+
 volumes:
   postgres_data:

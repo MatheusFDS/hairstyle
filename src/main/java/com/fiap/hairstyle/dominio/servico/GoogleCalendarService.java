@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.servico;
+package com.fiap.hairstyle.dominio.servico;
 
 import com.fiap.hairstyle.configuracao.GoogleCalendarConfig;
 import com.google.api.services.calendar.Calendar;
