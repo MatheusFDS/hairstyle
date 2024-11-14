@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Serviço responsável por agendar e enviar lembretes automáticos
+ * para os agendamentos que ocorrerão nas próximas 24 horas.
+ */
 @Service
 public class LembreteScheduler {
 
@@ -18,15 +22,23 @@ public class LembreteScheduler {
     @Autowired
     private NotificacaoService notificacaoService;
 
-    // Executa todos os dias às 8:00 para verificar agendamentos próximos
+    /**
+     * Verifica diariamente os agendamentos nas próximas 24 horas e
+     * envia lembretes aos clientes.
+     *
+     * <p>O método é executado automaticamente às 12:00 (meio-dia) todos os dias.</p>
+     *
+     * <p><b>Cron expression:</b> "0 0 12 * * *" - Executa às 12:00 diariamente.</p>
+     */
     @Scheduled(cron = "0 0 12 * * *")
     public void enviarLembretes() {
         LocalDateTime agora = LocalDateTime.now();
-        LocalDateTime limite = agora.plusHours(24); // Verifica agendamentos nas próximas 24 horas
+        LocalDateTime limite = agora.plusHours(24); // Define limite de 24 horas
 
-        // Busca agendamentos nas próximas 24 horas
+        // Busca agendamentos que ocorrerão nas próximas 24 horas
         List<Agendamento> agendamentosProximos = agendamentoRepository.findByDataHoraBetween(agora, limite);
 
+        // Envia lembrete para cada agendamento encontrado
         for (Agendamento agendamento : agendamentosProximos) {
             notificacaoService.enviarLembrete(agendamento);
         }

@@ -6,9 +6,18 @@ import com.fiap.hairstyle.dominio.entidades.Profissional;
 import com.fiap.hairstyle.dominio.entidades.Servico;
 import org.springframework.stereotype.Service;
 
+/**
+ * Serviço responsável por enviar notificações relacionadas a agendamentos,
+ * incluindo confirmação, lembrete, cancelamento e não comparecimento.
+ */
 @Service
 public class NotificacaoService {
 
+    /**
+     * Envia uma notificação de confirmação de agendamento ao cliente.
+     *
+     * @param agendamento Objeto Agendamento com os detalhes do serviço agendado.
+     */
     public void enviarConfirmacao(Agendamento agendamento) {
         Cliente cliente = agendamento.getCliente();
         Profissional profissional = agendamento.getProfissional();
@@ -27,6 +36,11 @@ public class NotificacaoService {
         System.out.println("Data e Hora: " + agendamento.getDataHora());
     }
 
+    /**
+     * Envia uma notificação de cancelamento do agendamento ao cliente.
+     *
+     * @param agendamento Objeto Agendamento com os detalhes do serviço cancelado.
+     */
     public void enviarCancelamento(Agendamento agendamento) {
         System.out.println("Notificação de Agendamento Cancelado:");
         System.out.println("Cliente: " + agendamento.getCliente().getNome());
@@ -36,7 +50,11 @@ public class NotificacaoService {
         System.out.println("Data e Hora: " + agendamento.getDataHora());
     }
 
-
+    /**
+     * Envia um lembrete de agendamento próximo ao cliente.
+     *
+     * @param agendamento Objeto Agendamento com os detalhes do serviço agendado.
+     */
     public void enviarLembrete(Agendamento agendamento) {
         Cliente cliente = agendamento.getCliente();
         Profissional profissional = agendamento.getProfissional();
@@ -55,6 +73,11 @@ public class NotificacaoService {
         System.out.println("Lembrete: Este é um lembrete para o seu próximo agendamento.");
     }
 
+    /**
+     * Envia uma notificação de não comparecimento ao profissional e/ou ao cliente.
+     *
+     * @param agendamento Objeto Agendamento que registra o não comparecimento.
+     */
     public void enviarNaoComparecimento(Agendamento agendamento) {
         System.out.println("Notificação de Não Comparecimento:");
         System.out.println("Cliente: " + (agendamento.getCliente() != null ? agendamento.getCliente().getNome() : "Desconhecido"));

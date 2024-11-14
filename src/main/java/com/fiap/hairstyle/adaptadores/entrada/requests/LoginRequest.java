@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.adaptadores.entrada;
+package com.fiap.hairstyle.adaptadores.entrada.requests;
 
 public class LoginRequest {
     private String username;
