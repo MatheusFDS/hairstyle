@@ -122,11 +122,41 @@ public class AgendamentoIntegrationTest {
         String loginPayload = String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password);
         HttpEntity<String> request = new HttpEntity<>(loginPayload, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(loginUrl, request, String.class);
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            token = response.getBody().replace("Bearer ", "");
-        } else {
-            throw new RuntimeException("Falha no login, verifique as credenciais e o endpoint.");
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(loginUrl, request, String.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                token = response.getBody().replace("Bearer ", "");
+            } else {
+                throw new RuntimeException("Falha no login, verifique as credenciais e o endpoint.");
+            }
+        } catch (Exception e) {
+            // Se o login falhar, cria o usuário e tenta novamente
+            criarUsuario(username, password);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(loginUrl, request, String.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                token = response.getBody().replace("Bearer ", "");
+            } else {
+                throw new RuntimeException("Falha no login mesmo após criar o usuário. Verifique as configurações.");
+            }
+        }
+    }
+
+    private void criarUsuario(String username, String password) {
+        String registerUrl = "http://localhost:8080/api/usuarios";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String registerPayload = String.format(
+                "{\"username\":\"%s\",\"password\":\"%s\",\"role\":\"ROLE_ADMIN\"}",
+                username,
+                password
+        );
+        HttpEntity<String> request = new HttpEntity<>(registerPayload, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(registerUrl, request, String.class);
+        if (response.getStatusCode() != HttpStatus.CREATED) {
+            throw new RuntimeException("Falha ao criar o usuário. Verifique o endpoint e os dados enviados.");
         }
     }
 }
