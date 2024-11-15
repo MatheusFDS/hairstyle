@@ -30,53 +30,97 @@ public class HorarioDisponivelController {
 
     @Operation(summary = "Listar horários disponíveis", description = "Retorna todos os horários disponíveis de um profissional específico.")
     @ApiResponse(responseCode = "200", description = "Horários disponíveis listados com sucesso")
-    @GetMapping("/profissional/{profissionalId}")
-    public ResponseEntity<List<HorarioDisponivel>> listarPorProfissional(
+    @GetMapping(value = "/profissional/{profissionalId}", produces = "application/json")
+    public ResponseEntity<?> listarPorProfissional(
             @Parameter(description = "ID do profissional", required = true) @PathVariable UUID profissionalId) {
-        List<HorarioDisponivel> horarios = horarioDisponivelRepository.findByProfissionalId(profissionalId);
-        return ResponseEntity.ok(horarios);
+        try {
+            List<HorarioDisponivel> horarios = horarioDisponivelRepository.findByProfissionalId(profissionalId);
+            return ResponseEntity.ok(horarios);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(500).body("Erro interno ao listar horários: " + ex.getMessage());
+        }
     }
 
     @Operation(summary = "Criar horário disponível", description = "Cria um novo horário disponível para o profissional especificado.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Horário disponível criado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Profissional não encontrado")
+            @ApiResponse(responseCode = "201", description = "Horário disponível criado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Profissional não encontrado"),
+            @ApiResponse(responseCode = "400", description = "Conflito de horário")
     })
-    @PostMapping("/profissional/{profissionalId}")
-    public ResponseEntity<HorarioDisponivel> criarHorario(
+    @PostMapping(value = "/profissional/{profissionalId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> criarHorario(
             @Parameter(description = "ID do profissional", required = true) @PathVariable UUID profissionalId,
             @RequestBody HorarioDisponivel horario) {
-        Optional<Profissional> profissionalOpt = profissionalRepository.findById(profissionalId);
-        if (profissionalOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        try {
+            Optional<Profissional> profissionalOpt = profissionalRepository.findById(profissionalId);
+            if (profissionalOpt.isEmpty()) {
+                return ResponseEntity.status(404).body("Profissional não encontrado.");
+            }
 
-        horario.setProfissional(profissionalOpt.get());
-        HorarioDisponivel novoHorario = horarioDisponivelRepository.save(horario);
-        return ResponseEntity.ok(novoHorario);
+            // Validar conflitos de horário
+            List<HorarioDisponivel> horariosExistentes = horarioDisponivelRepository.findByProfissionalId(profissionalId);
+            boolean conflito = horariosExistentes.stream().anyMatch(h ->
+                    h.getDiaSemana().equals(horario.getDiaSemana()) &&
+                            (horario.getHoraInicio().isBefore(h.getHoraFim()) && horario.getHoraFim().isAfter(h.getHoraInicio()))
+            );
+
+            if (conflito) {
+                return ResponseEntity.badRequest().body("O horário entra em conflito com outro já existente.");
+            }
+
+            // Associar o profissional ao horário
+            horario.setProfissional(profissionalOpt.get());
+            HorarioDisponivel novoHorario = horarioDisponivelRepository.save(horario);
+
+            return ResponseEntity.status(201).body(novoHorario);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(500).body("Erro interno ao criar o horário: " + ex.getMessage());
+        }
     }
 
     @Operation(summary = "Atualizar horário disponível", description = "Atualiza um horário disponível específico.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Horário atualizado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Horário não encontrado")
+            @ApiResponse(responseCode = "404", description = "Horário não encontrado"),
+            @ApiResponse(responseCode = "400", description = "Conflito de horário")
     })
-    @PutMapping("/{horarioId}")
-    public ResponseEntity<HorarioDisponivel> atualizarHorario(
+    @PutMapping(value = "/{horarioId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> atualizarHorario(
             @Parameter(description = "ID do horário", required = true) @PathVariable UUID horarioId,
             @RequestBody HorarioDisponivel horarioAtualizado) {
-        Optional<HorarioDisponivel> horarioOpt = horarioDisponivelRepository.findById(horarioId);
-        if (horarioOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        try {
+            Optional<HorarioDisponivel> horarioOpt = horarioDisponivelRepository.findById(horarioId);
+            if (horarioOpt.isEmpty()) {
+                return ResponseEntity.status(404).body("Horário não encontrado.");
+            }
+
+            HorarioDisponivel horarioExistente = horarioOpt.get();
+
+            // Validar conflitos de horário
+            List<HorarioDisponivel> horariosExistentes = horarioDisponivelRepository.findByProfissionalId(horarioExistente.getProfissional().getId());
+            boolean conflito = horariosExistentes.stream()
+                    .filter(h -> !h.getId().equals(horarioId)) // Ignorar o horário que está sendo atualizado
+                    .anyMatch(h ->
+                            h.getDiaSemana().equals(horarioAtualizado.getDiaSemana()) &&
+                                    (horarioAtualizado.getHoraInicio().isBefore(h.getHoraFim()) && horarioAtualizado.getHoraFim().isAfter(h.getHoraInicio()))
+                    );
+
+            if (conflito) {
+                return ResponseEntity.badRequest().body("O horário entra em conflito com outro já existente.");
+            }
+
+            horarioExistente.setDiaSemana(horarioAtualizado.getDiaSemana());
+            horarioExistente.setHoraInicio(horarioAtualizado.getHoraInicio());
+            horarioExistente.setHoraFim(horarioAtualizado.getHoraFim());
+
+            HorarioDisponivel horarioAtualizadoBD = horarioDisponivelRepository.save(horarioExistente);
+            return ResponseEntity.ok(horarioAtualizadoBD);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(500).body("Erro interno ao atualizar o horário: " + ex.getMessage());
         }
-
-        HorarioDisponivel horarioExistente = horarioOpt.get();
-        horarioExistente.setDiaSemana(horarioAtualizado.getDiaSemana());
-        horarioExistente.setHoraInicio(horarioAtualizado.getHoraInicio());
-        horarioExistente.setHoraFim(horarioAtualizado.getHoraFim());
-
-        HorarioDisponivel horarioAtualizadoBD = horarioDisponivelRepository.save(horarioExistente);
-        return ResponseEntity.ok(horarioAtualizadoBD);
     }
 
     @Operation(summary = "Excluir horário disponível", description = "Exclui um horário disponível específico.")
@@ -87,11 +131,16 @@ public class HorarioDisponivelController {
     @DeleteMapping("/{horarioId}")
     public ResponseEntity<Void> deletarHorario(
             @Parameter(description = "ID do horário", required = true) @PathVariable UUID horarioId) {
-        if (horarioDisponivelRepository.existsById(horarioId)) {
-            horarioDisponivelRepository.deleteById(horarioId);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            if (horarioDisponivelRepository.existsById(horarioId)) {
+                horarioDisponivelRepository.deleteById(horarioId);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(500).build();
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.fiap.hairstyle.dominio.entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,8 +9,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.util.List;
 import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Data
@@ -22,22 +21,25 @@ public class Estabelecimento {
     private UUID id;
 
     private String nome;
+
     private String endereco;
+
     private String horariosFuncionamento;
 
     @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Profissional> profissionais;
+    @JsonIgnore
+    private List<Profissional> profissionais = List.of();
 
     @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Servico> servicos;
+    @JsonIgnore
+    private List<Servico> servicos = List.of();
 
     @ElementCollection
     @CollectionTable(name = "estabelecimento_fotos", joinColumns = @JoinColumn(name = "estabelecimento_id"))
     @Column(name = "foto")
-    private List<String> fotos;
+    private List<String> fotos = List.of();
 
     @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Avaliacao> avaliacoes;
+    @JsonIgnore
+    private List<Avaliacao> avaliacoes = List.of();
 }

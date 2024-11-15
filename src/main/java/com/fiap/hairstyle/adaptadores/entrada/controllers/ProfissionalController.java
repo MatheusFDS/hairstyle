@@ -2,8 +2,10 @@ package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
 import com.fiap.hairstyle.dominio.entidades.HorarioDisponivel;
 import com.fiap.hairstyle.dominio.entidades.Profissional;
+import com.fiap.hairstyle.dominio.entidades.Estabelecimento;
 import com.fiap.hairstyle.adaptadores.saida.repositorios.HorarioDisponivelRepository;
 import com.fiap.hairstyle.adaptadores.saida.repositorios.ProfissionalRepository;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.EstabelecimentoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,10 +28,13 @@ public class ProfissionalController {
     private ProfissionalRepository profissionalRepository;
 
     @Autowired
+    private EstabelecimentoRepository estabelecimentoRepository;
+
+    @Autowired
     private HorarioDisponivelRepository horarioDisponivelRepository;
 
     @Operation(summary = "Listar todos os profissionais", description = "Retorna uma lista de todos os profissionais cadastrados.")
-    @GetMapping
+    @GetMapping(produces = "application/json")
     public List<Profissional> listarTodos() {
         return profissionalRepository.findAll();
     }
@@ -39,7 +44,7 @@ public class ProfissionalController {
             @ApiResponse(responseCode = "200", description = "Profissional encontrado"),
             @ApiResponse(responseCode = "404", description = "Profissional não encontrado")
     })
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Profissional> buscarPorId(
             @Parameter(description = "ID do profissional", required = true) @PathVariable UUID id) {
         Optional<Profissional> profissional = profissionalRepository.findById(id);
@@ -48,9 +53,20 @@ public class ProfissionalController {
 
     @Operation(summary = "Criar novo profissional", description = "Cadastra um novo profissional no sistema.")
     @ApiResponse(responseCode = "201", description = "Profissional criado com sucesso")
-    @PostMapping
-    public Profissional criar(@RequestBody Profissional profissional) {
-        return profissionalRepository.save(profissional);
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> criar(@RequestBody Profissional profissional) {
+        if (profissional.getEstabelecimento() == null || profissional.getEstabelecimento().getId() == null) {
+            return ResponseEntity.badRequest().body("Estabelecimento é obrigatório.");
+        }
+
+        Optional<Estabelecimento> estabelecimentoOpt = estabelecimentoRepository.findById(profissional.getEstabelecimento().getId());
+        if (!estabelecimentoOpt.isPresent()) {
+            return ResponseEntity.badRequest().body("Estabelecimento não encontrado.");
+        }
+
+        profissional.setEstabelecimento(estabelecimentoOpt.get());
+        Profissional novoProfissional = profissionalRepository.save(profissional);
+        return ResponseEntity.ok(novoProfissional);
     }
 
     @Operation(summary = "Atualizar profissional", description = "Atualiza as informações de um profissional específico.")
@@ -58,8 +74,8 @@ public class ProfissionalController {
             @ApiResponse(responseCode = "200", description = "Profissional atualizado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Profissional não encontrado")
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<Profissional> atualizar(
+    @PutMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> atualizar(
             @Parameter(description = "ID do profissional", required = true) @PathVariable UUID id,
             @RequestBody Profissional profissionalAtualizado) {
         return profissionalRepository.findById(id).map(profissional -> {
@@ -67,25 +83,20 @@ public class ProfissionalController {
             profissional.setEspecialidade(profissionalAtualizado.getEspecialidade());
             profissional.setTelefone(profissionalAtualizado.getTelefone());
             profissional.setTarifa(profissionalAtualizado.getTarifa());
-            profissional.setEstabelecimento(profissionalAtualizado.getEstabelecimento());
-            return ResponseEntity.ok(profissionalRepository.save(profissional));
-        }).orElseGet(() -> ResponseEntity.notFound().build());
-    }
 
-    @Operation(summary = "Deletar profissional", description = "Exclui um profissional específico do sistema.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Profissional excluído com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Profissional não encontrado")
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(
-            @Parameter(description = "ID do profissional", required = true) @PathVariable UUID id) {
-        if (profissionalRepository.existsById(id)) {
-            profissionalRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+            if (profissionalAtualizado.getEstabelecimento() != null && profissionalAtualizado.getEstabelecimento().getId() != null) {
+                Optional<Estabelecimento> estabelecimentoOpt = estabelecimentoRepository.findById(profissionalAtualizado.getEstabelecimento().getId());
+                if (!estabelecimentoOpt.isPresent()) {
+                    return ResponseEntity.badRequest().body("Estabelecimento não encontrado.");
+                }
+                profissional.setEstabelecimento(estabelecimentoOpt.get());
+            } else {
+                return ResponseEntity.badRequest().body("Estabelecimento é obrigatório.");
+            }
+
+            Profissional atualizado = profissionalRepository.save(profissional);
+            return ResponseEntity.ok(atualizado);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Definir disponibilidade de horários", description = "Define a disponibilidade de horários para um profissional.")

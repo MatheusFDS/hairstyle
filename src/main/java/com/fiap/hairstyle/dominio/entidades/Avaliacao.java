@@ -20,16 +20,16 @@ public class Avaliacao {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
-    @JsonBackReference // Define o lado "filho" para cliente
+    @JsonBackReference
     private Cliente cliente;
 
     @ManyToOne
     @JoinColumn(name = "profissional_id", nullable = true)
-    @JsonBackReference // Define o lado "filho" para profissional
+    @JsonBackReference
     private Profissional profissional;
 
     @ManyToOne
     @JoinColumn(name = "estabelecimento_id", nullable = true)
-    @JsonBackReference // Define o lado "filho" para estabelecimento
+    @JsonBackReference
     private Estabelecimento estabelecimento;
 }

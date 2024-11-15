@@ -1,6 +1,6 @@
 package com.fiap.hairstyle.dominio.entidades;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +13,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Servico {
 
     @Id
@@ -25,8 +26,8 @@ public class Servico {
     private Double preco;
     private Integer duracao;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "estabelecimento_id", nullable = false)
-    @JsonBackReference // Define o lado "filho" para estabelecimento
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Ignora o proxy de `Estabelecimento`
     private Estabelecimento estabelecimento;
 }

@@ -22,16 +22,21 @@ public class EstabelecimentoController {
         return estabelecimentoRepository.findAll();
     }
 
-    // Alteração para UUID no PathVariable
     @GetMapping("/{id}")
     public ResponseEntity<Estabelecimento> buscarPorId(@PathVariable UUID id) {
         Optional<Estabelecimento> estabelecimento = estabelecimentoRepository.findById(id);
         return estabelecimento.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public Estabelecimento criar(@RequestBody Estabelecimento estabelecimento) {
-        return estabelecimentoRepository.save(estabelecimento);
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Estabelecimento> criar(@RequestBody Estabelecimento estabelecimento) {
+        // Ignorar relacionamentos durante o cadastro
+        estabelecimento.setProfissionais(List.of());
+        estabelecimento.setServicos(List.of());
+        estabelecimento.setAvaliacoes(List.of());
+
+        Estabelecimento novoEstabelecimento = estabelecimentoRepository.save(estabelecimento);
+        return ResponseEntity.ok(novoEstabelecimento);
     }
 
     @PutMapping("/{id}")
@@ -39,16 +44,14 @@ public class EstabelecimentoController {
         return estabelecimentoRepository.findById(id).map(estabelecimento -> {
             estabelecimento.setNome(estabelecimentoAtualizado.getNome());
             estabelecimento.setEndereco(estabelecimentoAtualizado.getEndereco());
-            estabelecimento.setServicos(estabelecimentoAtualizado.getServicos()); // Atualiza servicos
-            estabelecimento.setProfissionais(estabelecimentoAtualizado.getProfissionais()); // Atualiza profissionais
+            estabelecimento.setServicos(estabelecimentoAtualizado.getServicos());
+            estabelecimento.setProfissionais(estabelecimentoAtualizado.getProfissionais());
             estabelecimento.setHorariosFuncionamento(estabelecimentoAtualizado.getHorariosFuncionamento());
             estabelecimento.setFotos(estabelecimentoAtualizado.getFotos());
             return ResponseEntity.ok(estabelecimentoRepository.save(estabelecimento));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-    // Alteração para UUID no PathVariable
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         if (estabelecimentoRepository.existsById(id)) {

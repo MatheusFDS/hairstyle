@@ -1,6 +1,8 @@
 package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
+import com.fiap.hairstyle.dominio.entidades.Estabelecimento;
 import com.fiap.hairstyle.dominio.entidades.Servico;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.EstabelecimentoRepository;
 import com.fiap.hairstyle.adaptadores.saida.repositorios.ServicoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,9 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,8 +27,11 @@ public class ServicoController {
     @Autowired
     private ServicoRepository servicoRepository;
 
+    @Autowired
+    private EstabelecimentoRepository estabelecimentoRepository;
+
     @Operation(summary = "Listar todos os serviços", description = "Retorna uma lista de todos os serviços disponíveis.")
-    @GetMapping
+    @GetMapping(produces = "application/json")
     public List<Servico> listarTodos() {
         return servicoRepository.findAll();
     }
@@ -34,7 +41,7 @@ public class ServicoController {
             @ApiResponse(responseCode = "200", description = "Serviço encontrado"),
             @ApiResponse(responseCode = "404", description = "Serviço não encontrado")
     })
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Servico> buscarPorId(
             @Parameter(description = "ID do serviço", required = true) @PathVariable UUID id) {
         Optional<Servico> servico = servicoRepository.findById(id);
@@ -43,9 +50,21 @@ public class ServicoController {
 
     @Operation(summary = "Criar novo serviço", description = "Cadastra um novo serviço no sistema.")
     @ApiResponse(responseCode = "201", description = "Serviço criado com sucesso")
-    @PostMapping
-    public Servico criar(@RequestBody Servico servico) {
-        return servicoRepository.save(servico);
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> criar(@Valid @RequestBody Servico servico) {
+        // Verificar se o estabelecimento existe
+        if (servico.getEstabelecimento() == null || servico.getEstabelecimento().getId() == null) {
+            return ResponseEntity.badRequest().body("Estabelecimento é obrigatório.");
+        }
+
+        Optional<Estabelecimento> estabelecimentoOpt = estabelecimentoRepository.findById(servico.getEstabelecimento().getId());
+        if (!estabelecimentoOpt.isPresent()) {
+            return ResponseEntity.badRequest().body("Estabelecimento não encontrado.");
+        }
+
+        servico.setEstabelecimento(estabelecimentoOpt.get());
+        Servico novoServico = servicoRepository.save(servico);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoServico);
     }
 
     @Operation(summary = "Atualizar serviço", description = "Atualiza as informações de um serviço específico.")
@@ -53,17 +72,29 @@ public class ServicoController {
             @ApiResponse(responseCode = "200", description = "Serviço atualizado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Serviço não encontrado")
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<Servico> atualizar(
+    @PutMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> atualizar(
             @Parameter(description = "ID do serviço", required = true) @PathVariable UUID id,
-            @RequestBody Servico servicoAtualizado) {
+            @Valid @RequestBody Servico servicoAtualizado) {
         return servicoRepository.findById(id).map(servico -> {
             servico.setNome(servicoAtualizado.getNome());
             servico.setDescricao(servicoAtualizado.getDescricao());
             servico.setPreco(servicoAtualizado.getPreco());
             servico.setDuracao(servicoAtualizado.getDuracao());
-            servico.setEstabelecimento(servicoAtualizado.getEstabelecimento());
-            return ResponseEntity.ok(servicoRepository.save(servico));
+
+            // Verificar e atualizar o estabelecimento
+            if (servicoAtualizado.getEstabelecimento() != null && servicoAtualizado.getEstabelecimento().getId() != null) {
+                Optional<Estabelecimento> estabelecimentoOpt = estabelecimentoRepository.findById(servicoAtualizado.getEstabelecimento().getId());
+                if (!estabelecimentoOpt.isPresent()) {
+                    return ResponseEntity.badRequest().body("Estabelecimento não encontrado.");
+                }
+                servico.setEstabelecimento(estabelecimentoOpt.get());
+            } else {
+                return ResponseEntity.badRequest().body("Estabelecimento é obrigatório.");
+            }
+
+            Servico servicoSalvo = servicoRepository.save(servico);
+            return ResponseEntity.ok(servicoSalvo);
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
