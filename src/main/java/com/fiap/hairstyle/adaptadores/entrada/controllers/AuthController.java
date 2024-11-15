@@ -1,6 +1,6 @@
-package com.fiap.hairstyle.adaptadores.entrada;
+package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
-import com.fiap.hairstyle.adaptadores.entrada.requests.LoginRequest;
+import com.fiap.hairstyle.adaptadores.entrada.controllers.requests.LoginRequest;
 import com.fiap.hairstyle.dominio.servico.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

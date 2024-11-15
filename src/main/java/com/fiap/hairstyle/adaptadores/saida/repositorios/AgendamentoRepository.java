@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.dominio.repositorios;
+package com.fiap.hairstyle.adaptadores.saida.repositorios;
 
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -39,4 +39,6 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, UUID> 
     @Query("SELECT a FROM Agendamento a WHERE a.profissional.estabelecimento.id = :estabelecimentoId")
     List<Agendamento> findByEstabelecimentoId(@Param("estabelecimentoId") UUID estabelecimentoId);
 
+    // Novo método para verificar a existência de um agendamento para um profissional em uma data e hora específicas
+    boolean existsByProfissionalIdAndDataHora(UUID profissionalId, LocalDateTime dataHora);
 }

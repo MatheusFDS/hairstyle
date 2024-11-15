@@ -1,6 +1,6 @@
 package com.fiap.hairstyle.configuracao;
 
-import com.fiap.hairstyle.servico.JwtService;
+import com.fiap.hairstyle.dominio.servico.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;

@@ -2,7 +2,7 @@ package com.fiap.hairstyle.adaptadores.saida.repositorios;
 
 import com.fiap.hairstyle.aplicacao.portas.saida.AgendamentoSaidaPort;
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
-import com.fiap.hairstyle.adptadores.saida.repositorios.AgendamentoRepository;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.AgendamentoRepository;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.UUID;

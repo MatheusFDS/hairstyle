@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.dominio.repositorios;
+package com.fiap.hairstyle.adaptadores.saida.repositorios;
 
 import com.fiap.hairstyle.dominio.entidades.HorarioDisponivel;
 import org.springframework.data.jpa.repository.JpaRepository;

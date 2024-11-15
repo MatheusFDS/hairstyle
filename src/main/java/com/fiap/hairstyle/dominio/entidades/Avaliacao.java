@@ -1,10 +1,7 @@
 package com.fiap.hairstyle.dominio.entidades;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
@@ -18,24 +15,21 @@ public class Avaliacao {
     @GeneratedValue
     private UUID id;
 
-    @Min(1)
-    @Max(5)
-    private int nota; // Nota de 1 a 5, com validação
-
+    private int nota;
     private String comentario;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference // Define o lado "filho" para cliente
     private Cliente cliente;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "profissional_id", nullable = true)
-    @JsonBackReference
+    @JsonBackReference // Define o lado "filho" para profissional
     private Profissional profissional;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "estabelecimento_id", nullable = true)
-    @JsonBackReference
+    @JsonBackReference // Define o lado "filho" para estabelecimento
     private Estabelecimento estabelecimento;
 }

@@ -1,7 +1,7 @@
-package com.fiap.hairstyle.adaptadores.entrada;
+package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
 import com.fiap.hairstyle.dominio.entidades.Cliente;
-import com.fiap.hairstyle.dominio.repositorios.ClienteRepository;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.ClienteRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

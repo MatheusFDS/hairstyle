@@ -1,7 +1,7 @@
-package com.fiap.hairstyle.adaptadores.entrada;
+package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
 import com.fiap.hairstyle.dominio.entidades.Usuario;
-import com.fiap.hairstyle.dominio.repositorios.UsuarioRepository;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

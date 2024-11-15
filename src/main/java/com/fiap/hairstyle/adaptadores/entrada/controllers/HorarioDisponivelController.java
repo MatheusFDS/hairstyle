@@ -1,9 +1,9 @@
-package com.fiap.hairstyle.adaptadores.entrada;
+package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
 import com.fiap.hairstyle.dominio.entidades.HorarioDisponivel;
 import com.fiap.hairstyle.dominio.entidades.Profissional;
-import com.fiap.hairstyle.dominio.repositorios.HorarioDisponivelRepository;
-import com.fiap.hairstyle.dominio.repositorios.ProfissionalRepository;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.HorarioDisponivelRepository;
+import com.fiap.hairstyle.adaptadores.saida.repositorios.ProfissionalRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Servico {
+
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -26,6 +27,6 @@ public class Servico {
 
     @ManyToOne
     @JoinColumn(name = "estabelecimento_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference // Define o lado "filho" para estabelecimento
     private Estabelecimento estabelecimento;
 }
