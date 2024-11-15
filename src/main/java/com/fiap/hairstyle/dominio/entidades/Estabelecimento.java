@@ -37,6 +37,7 @@ public class Estabelecimento {
     @ElementCollection
     @CollectionTable(name = "estabelecimento_fotos", joinColumns = @JoinColumn(name = "estabelecimento_id"))
     @Column(name = "foto")
+    @JsonIgnore
     private List<String> fotos = List.of();
 
     @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL, orphanRemoval = true)

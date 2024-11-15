@@ -109,8 +109,8 @@ public class AgendamentoIntegrationTest {
 
         ResponseEntity<Agendamento> response = restTemplate.postForEntity(url, request, Agendamento.class);
 
-        // Valida a resposta
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        // Valida a resposta ajustada para 201 CREATED
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertTrue(response.getBody() != null && response.getBody().getId() != null);
     }
 
