@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,46 +18,49 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/clientes")
-@Tag(name = "Clientes", description = "Endpoints para gerenciamento de clientes")
+@Tag(name = "Clientes", description = "Endpoints para gerenciamento de clientes. Requer autenticação com token.")
+@SecurityRequirement(name = "Bearer Authentication")
 public class ClienteController {
 
     @Autowired
     private ClienteRepository clienteRepository;
 
-    @Operation(summary = "Listar todos os clientes", description = "Retorna uma lista com todos os clientes cadastrados no sistema.")
-    @GetMapping
+    @Operation(summary = "Listar todos os clientes", description = "Retorna uma lista com todos os clientes cadastrados no sistema. Requer autenticação com token.")
+    @ApiResponse(responseCode = "200", description = "Lista de clientes retornada com sucesso.")
+    @GetMapping(produces = "application/json")
     public List<Cliente> listarTodos() {
         return clienteRepository.findAll();
     }
 
-    @Operation(summary = "Buscar cliente por ID", description = "Busca um cliente específico pelo seu ID.")
+    @Operation(summary = "Buscar cliente por ID", description = "Busca um cliente específico pelo seu ID. Requer autenticação com token.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cliente encontrado"),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+            @ApiResponse(responseCode = "200", description = "Cliente encontrado."),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado.")
     })
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Cliente> buscarPorId(
             @Parameter(description = "ID do cliente", required = true) @PathVariable UUID id) {
         Optional<Cliente> cliente = clienteRepository.findById(id);
         return cliente.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Criar novo cliente", description = "Cadastra um novo cliente no sistema.")
-    @ApiResponse(responseCode = "201", description = "Cliente criado com sucesso")
-    @PostMapping
-    public Cliente criar(@RequestBody Cliente cliente) {
+    @Operation(summary = "Criar novo cliente", description = "Cadastra um novo cliente no sistema. Requer autenticação com token.")
+    @ApiResponse(responseCode = "201", description = "Cliente criado com sucesso.")
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public Cliente criar(
+            @Parameter(description = "Dados do cliente a ser criado", required = true) @RequestBody Cliente cliente) {
         return clienteRepository.save(cliente);
     }
 
-    @Operation(summary = "Atualizar cliente", description = "Atualiza as informações de um cliente específico.")
+    @Operation(summary = "Atualizar cliente", description = "Atualiza as informações de um cliente específico. Requer autenticação com token.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+            @ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado.")
     })
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Cliente> atualizar(
             @Parameter(description = "ID do cliente", required = true) @PathVariable UUID id,
-            @RequestBody Cliente clienteAtualizado) {
+            @Parameter(description = "Dados do cliente a serem atualizados", required = true) @RequestBody Cliente clienteAtualizado) {
         return clienteRepository.findById(id).map(cliente -> {
             cliente.setNome(clienteAtualizado.getNome());
             cliente.setTelefone(clienteAtualizado.getTelefone());
@@ -65,10 +69,10 @@ public class ClienteController {
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Deletar cliente", description = "Exclui um cliente específico do sistema.")
+    @Operation(summary = "Deletar cliente", description = "Exclui um cliente específico do sistema. Requer autenticação com token.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Cliente excluído com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+            @ApiResponse(responseCode = "204", description = "Cliente excluído com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado.")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(

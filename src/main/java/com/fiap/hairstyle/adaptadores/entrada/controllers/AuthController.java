@@ -3,6 +3,8 @@ package com.fiap.hairstyle.adaptadores.entrada.controllers;
 import com.fiap.hairstyle.adaptadores.entrada.controllers.requests.LoginRequest;
 import com.fiap.hairstyle.dominio.servico.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,13 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller responsável pela autenticação de usuários.
- * Gera um token JWT para usuários autenticados com sucesso.
- */
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Autenticação", description = "Endpoint para autenticação de usuários")
+@Tag(name = "Autenticação", description = "Endpoints para autenticação de usuários")
 public class AuthController {
 
     @Autowired
@@ -28,25 +26,20 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
-    /**
-     * Endpoint de login do sistema.
-     * Retorna um token JWT para requisições autenticadas.
-     *
-     * @param loginRequest dados de login (username e senha)
-     * @return ResponseEntity com token JWT ou mensagem de erro
-     */
-    @Operation(summary = "Realizar login e obter token JWT")
+    @Operation(summary = "Realizar login e obter token JWT", description = "Faz login com credenciais válidas e retorna um token JWT. Use este token para autenticar outras chamadas.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso. Token JWT retornado."),
+            @ApiResponse(responseCode = "401", description = "Falha na autenticação: credenciais inválidas.")
+    })
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
         try {
-            // Autentica as credenciais do usuário
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
                             loginRequest.getPassword()
                     )
             );
-            // Gera o token JWT após autenticação bem-sucedida
             String token = jwtService.generateToken(loginRequest.getUsername());
             return ResponseEntity.ok("Bearer " + token);
         } catch (AuthenticationException e) {

@@ -1,77 +1,101 @@
-# HairstyleFIAP
+# Hairstyle - Sistema de Agendamento e Gerenciamento para Serviços de Beleza e Bem-Estar
 
-Sistema de agendamento e gerenciamento para serviços de beleza e bem-estar, desenvolvido em Spring Boot com banco de dados PostgreSQL e autenticação JWT.
-
-## Índice
-- [Funcionalidades](#funcionalidades)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Pré-requisitos](#pré-requisitos)
-- [Configuração do Banco de Dados](#configuração-do-banco-de-dados)
-- [Configuração do Projeto](#configuração-do-projeto)
-- [Autenticação JWT](#autenticação-jwt)
-- [Endpoints da API](#endpoints-da-api)
-- [Testes com Postman](#testes-com-postman)
-- [Possíveis Problemas e Soluções](#possíveis-problemas-e-soluções)
-- [Licença](#licença)
+Este projeto é um sistema completo de agendamento e gerenciamento de serviços de beleza e bem-estar, desenvolvido com Java e arquitetura limpa, utilizando Docker para simplificar o deploy.
 
 ## Funcionalidades
 
-O sistema permite:
-- Gerenciamento de **Clientes**, **Estabelecimentos**, **Serviços** e **Profissionais**.
-- **Agendamentos** vinculados a clientes, serviços e profissionais.
-- Autenticação JWT para garantir segurança nas rotas protegidas.
+1. **Cadastro de Estabelecimentos**:
+    - Permite o registro de estabelecimentos, incluindo informações como nome, endereço, serviços oferecidos e horários de funcionamento.
 
-## Tecnologias Utilizadas
-- **Java 17**
-- **Spring Boot 3.3.4**
-- **PostgreSQL 16**
-- **Docker** e **Docker Compose**
-- **Maven** para gerenciamento de dependências
-- **Lombok** para reduzir código boilerplate
-- **Spring Security** com **JWT** para autenticação
+2. **Perfil de Profissionais**:
+    - Cadastro de profissionais com detalhes como especialidades, horários disponíveis e tarifas.
 
-## Pré-requisitos
+3. **Agendamento de Serviços**:
+    - Visualização de serviços, disponibilidade e agendamentos online.
+    - Envio de confirmações e lembretes automáticos.
 
-- **Java 17** ou superior.
-- **Maven** para gerenciamento de dependências.
-- **Docker** para containerização do banco de dados PostgreSQL.
+4. **Avaliações e Comentários**:
+    - Avaliação de estabelecimentos e profissionais após o serviço.
 
-Para verificar se você possui as ferramentas instaladas, execute:
-```bash
-java -version
-mvn -version
-docker --version
-```
+5. **Busca e Filtragem Avançada**:
+    - Pesquisa por nome, localização, serviços e avaliações com filtros avançados.
 
+6. **Gerenciamento de Agendamentos**:
+    - Painel de controle para reagendamentos, cancelamentos e ajustes na agenda.
 
-## Configuração do Banco de Dados
-O banco de dados é configurado para rodar no Docker com a imagem oficial do PostgreSQL:
+7. **Integração com Calendários**:
+    - Suporte para sincronização com Google Calendar (opcional).
 
-Crie um arquivo docker-compose.yml com o conteúdo abaixo:
+---
 
-```
-yaml
+## Instruções para Rodar o Projeto
 
-version: '3.8'
-services:
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: hairstyle_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
+### Pré-requisitos
 
-volumes:
-  postgres_data:
-```
-Execute o seguinte comando para iniciar o banco de dados:
+- **Java 17** ou superior
+- **Docker** instalado na máquina
 
-```
-docker-compose up -d
-```
+### Passos
 
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/MatheusFDS/hairstyle.git
+    
+2. Navegue até o diretório do projeto:  
+   ```bash
+    cd hairstyle
+      
+3. Construa as imagens do Docker:
+    ```bash
+    docker-compose build
+ 
+4. Inicie o ambiente:
+     ```bash
+     docker-compose up
+
+###  Fluxo de Uso do Sistema
+Para utilizar o sistema, siga a sequência abaixo usando a documentação Swagger disponível em http://localhost:8080/swagger-ui/index.html#:
+1. **cria um usuário:**
+   - Endpoint: POST /api/usuarios
+       ```bash
+     {
+     "username": "seu-usuario",
+     "password": "sua-senha",
+     "role": "ROLE_ADMIN"
+     }
+  
+2. **cria um usuário:**
+   - Endpoint: POST /api/auth/login
+       ```bash
+     {
+     "username": "seu-usuario",
+     "password": "sua-senha"
+     }
+
+**Criar um estabelecimento (com o token)**:
+
+    Use o token no header de autenticação (Bearer Token).
+    Endpoint: POST /api/estabelecimentos
+    Criar um profissional (com o token):
+
+Endpoint: POST /api/profissionais
+Criar um serviço (com o token):
+
+Endpoint: POST /api/servicos
+Criar um cliente:
+
+Endpoint: POST /api/clientes
+Criar disponibilidade para os profissionais (com o token):
+
+Endpoint: POST /api/horarios-disponiveis/profissional/{id}
+Criar um agendamento (com o token):
+
+Endpoint: POST /api/agendamentos
+Avaliar o estabelecimento ou profissional (com o token):
+
+Endpoint para avaliar profissional: POST /api/avaliacoes/profissional/{agendamentoId}
+Endpoint para avaliar estabelecimento: POST /api/avaliacoes/estabelecimento/{agendamentoId}
+Realizar buscas avançadas dos estabelecimentos:
+
+Endpoint: GET /api/estabelecimentos/filtros
+Parâmetros opcionais: nome, endereco, precoMin, precoMax, servico, avaliacaoMinima

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/agendamentos")
 @Tag(name = "Agendamentos", description = "Endpoints para gerenciamento de agendamentos de serviços")
+@SecurityRequirement(name = "Bearer Authentication")
 public class AgendamentoController {
 
     private static final Logger logger = LoggerFactory.getLogger(AgendamentoController.class);
@@ -49,17 +51,24 @@ public class AgendamentoController {
     @Autowired
     private GoogleCalendarService googleCalendarService;
 
-    @Operation(summary = "Listar todos os agendamentos", description = "Retorna uma lista de todos os agendamentos.")
+    @Operation(
+            summary = "Listar todos os agendamentos",
+            description = "Retorna uma lista de todos os agendamentos cadastrados no sistema. Requer autenticação via token JWT."
+    )
+    @ApiResponse(responseCode = "200", description = "Lista de agendamentos retornada com sucesso.")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Agendamento>> listarTodos() {
         logger.info("Listando todos os agendamentos.");
         return ResponseEntity.ok(agendamentoRepository.findAll());
     }
 
-    @Operation(summary = "Buscar agendamento por ID", description = "Busca um agendamento específico pelo ID.")
+    @Operation(
+            summary = "Buscar agendamento por ID",
+            description = "Busca os detalhes de um agendamento específico pelo ID. Requer autenticação via token JWT."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Agendamento encontrado"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado")
+            @ApiResponse(responseCode = "200", description = "Agendamento encontrado."),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado.")
     })
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Agendamento> buscarPorId(
@@ -70,7 +79,15 @@ public class AgendamentoController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Criar novo agendamento", description = "Cria um novo agendamento, incluindo verificação de disponibilidade.")
+    @Operation(
+            summary = "Criar novo agendamento",
+            description = "Cria um novo agendamento, verificando a disponibilidade do horário. Requer autenticação via token JWT."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Agendamento criado com sucesso."),
+            @ApiResponse(responseCode = "400", description = "Erro nos dados do agendamento ou horário indisponível."),
+            @ApiResponse(responseCode = "500", description = "Erro interno ao criar o agendamento.")
+    })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Agendamento> criar(@RequestBody Agendamento agendamento) {
         logger.info("Tentando criar agendamento para o cliente {} no horário {}",
@@ -141,6 +158,14 @@ public class AgendamentoController {
         }
     }
 
+    @Operation(
+            summary = "Marcar não comparecimento",
+            description = "Marca um agendamento como 'não comparecido'. Requer autenticação via token JWT."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Agendamento marcado como não comparecido."),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado.")
+    })
     @PatchMapping("/{id}/nao-comparecimento")
     public ResponseEntity<?> marcarNaoComparecimento(@PathVariable UUID id) {
         Optional<Agendamento> agendamentoOpt = agendamentoRepository.findById(id);
@@ -154,6 +179,15 @@ public class AgendamentoController {
         return ResponseEntity.notFound().build();
     }
 
+    @Operation(
+            summary = "Reagendar agendamento",
+            description = "Permite reagendar um agendamento para um novo horário. Requer autenticação via token JWT."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Agendamento reagendado com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado."),
+            @ApiResponse(responseCode = "400", description = "Horário indisponível.")
+    })
     @PutMapping("/{id}/reagendar")
     public ResponseEntity<?> reagendarAgendamento(@PathVariable UUID id, @RequestBody LocalDateTime novaDataHora) {
         Optional<Agendamento> agendamentoOpt = agendamentoRepository.findById(id);
@@ -197,6 +231,14 @@ public class AgendamentoController {
         return ResponseEntity.notFound().build();
     }
 
+    @Operation(
+            summary = "Cancelar agendamento",
+            description = "Permite cancelar um agendamento. Requer autenticação via token JWT."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Agendamento cancelado com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado.")
+    })
     @DeleteMapping("/{id}/cancelar")
     public ResponseEntity<?> cancelarAgendamento(@PathVariable UUID id) {
         Optional<Agendamento> agendamentoOpt = agendamentoRepository.findById(id);

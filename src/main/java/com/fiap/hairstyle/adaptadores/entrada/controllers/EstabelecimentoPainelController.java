@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/estabelecimentos/{estabelecimentoId}/painel")
 @Tag(name = "Painel do Estabelecimento", description = "Operações de gerenciamento de agendamentos para estabelecimentos")
+@SecurityRequirement(name = "Bearer Authentication")
 public class EstabelecimentoPainelController {
 
     @Autowired
@@ -28,8 +30,11 @@ public class EstabelecimentoPainelController {
     @Autowired
     private NotificacaoService notificacaoService;
 
-    @Operation(summary = "Listar agendamentos", description = "Retorna todos os agendamentos de um estabelecimento específico.")
-    @ApiResponse(responseCode = "200", description = "Agendamentos listados com sucesso")
+    @Operation(
+            summary = "Listar agendamentos",
+            description = "Retorna todos os agendamentos de um estabelecimento específico. Requer autenticação via token JWT."
+    )
+    @ApiResponse(responseCode = "200", description = "Agendamentos listados com sucesso.")
     @GetMapping("/agendamentos")
     public ResponseEntity<List<Agendamento>> listarAgendamentos(
             @Parameter(description = "ID do estabelecimento", required = true) @PathVariable UUID estabelecimentoId) {
@@ -37,10 +42,13 @@ public class EstabelecimentoPainelController {
         return ResponseEntity.ok(agendamentos);
     }
 
-    @Operation(summary = "Cancelar agendamento", description = "Permite o cancelamento de um agendamento específico.")
+    @Operation(
+            summary = "Cancelar agendamento",
+            description = "Permite o cancelamento de um agendamento específico. Requer autenticação via token JWT."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Agendamento cancelado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado")
+            @ApiResponse(responseCode = "204", description = "Agendamento cancelado com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado.")
     })
     @DeleteMapping("/agendamentos/{agendamentoId}")
     public ResponseEntity<Void> cancelarAgendamento(
@@ -55,10 +63,13 @@ public class EstabelecimentoPainelController {
         }
     }
 
-    @Operation(summary = "Reagendar agendamento", description = "Permite reagendar um agendamento para uma nova data e hora.")
+    @Operation(
+            summary = "Reagendar agendamento",
+            description = "Permite reagendar um agendamento para uma nova data e hora. Requer autenticação via token JWT."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Agendamento reagendado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado")
+            @ApiResponse(responseCode = "200", description = "Agendamento reagendado com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado.")
     })
     @PutMapping("/agendamentos/{agendamentoId}/reagendar")
     public ResponseEntity<Agendamento> reagendarAgendamento(
@@ -76,10 +87,13 @@ public class EstabelecimentoPainelController {
         }
     }
 
-    @Operation(summary = "Marcar não comparecimento", description = "Marca um agendamento como 'não comparecimento'.")
+    @Operation(
+            summary = "Marcar não comparecimento",
+            description = "Marca um agendamento como 'não comparecimento'. Requer autenticação via token JWT."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Agendamento marcado como não comparecimento com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado")
+            @ApiResponse(responseCode = "200", description = "Agendamento marcado como não comparecimento com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado.")
     })
     @PutMapping("/agendamentos/{agendamentoId}/naoComparecimento")
     public ResponseEntity<Agendamento> marcarNaoComparecimento(

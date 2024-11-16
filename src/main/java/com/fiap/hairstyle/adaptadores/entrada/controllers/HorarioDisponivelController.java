@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/horarios-disponiveis")
 @Tag(name = "Horários Disponíveis", description = "Operações relacionadas aos horários disponíveis dos profissionais")
+@SecurityRequirement(name = "Bearer Authentication")
 public class HorarioDisponivelController {
 
     @Autowired
@@ -28,8 +30,11 @@ public class HorarioDisponivelController {
     @Autowired
     private ProfissionalRepository profissionalRepository;
 
-    @Operation(summary = "Listar horários disponíveis", description = "Retorna todos os horários disponíveis de um profissional específico.")
-    @ApiResponse(responseCode = "200", description = "Horários disponíveis listados com sucesso")
+    @Operation(
+            summary = "Listar horários disponíveis",
+            description = "Retorna todos os horários disponíveis de um profissional específico. Requer autenticação via token JWT."
+    )
+    @ApiResponse(responseCode = "200", description = "Horários disponíveis listados com sucesso.")
     @GetMapping(value = "/profissional/{profissionalId}", produces = "application/json")
     public ResponseEntity<?> listarPorProfissional(
             @Parameter(description = "ID do profissional", required = true) @PathVariable UUID profissionalId) {
@@ -42,11 +47,14 @@ public class HorarioDisponivelController {
         }
     }
 
-    @Operation(summary = "Criar horário disponível", description = "Cria um novo horário disponível para o profissional especificado.")
+    @Operation(
+            summary = "Criar horário disponível",
+            description = "Cria um novo horário disponível para o profissional especificado. Requer autenticação via token JWT."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Horário disponível criado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Profissional não encontrado"),
-            @ApiResponse(responseCode = "400", description = "Conflito de horário")
+            @ApiResponse(responseCode = "201", description = "Horário disponível criado com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Profissional não encontrado."),
+            @ApiResponse(responseCode = "400", description = "Conflito de horário.")
     })
     @PostMapping(value = "/profissional/{profissionalId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> criarHorario(
@@ -80,11 +88,14 @@ public class HorarioDisponivelController {
         }
     }
 
-    @Operation(summary = "Atualizar horário disponível", description = "Atualiza um horário disponível específico.")
+    @Operation(
+            summary = "Atualizar horário disponível",
+            description = "Atualiza um horário disponível específico. Requer autenticação via token JWT."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Horário atualizado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Horário não encontrado"),
-            @ApiResponse(responseCode = "400", description = "Conflito de horário")
+            @ApiResponse(responseCode = "200", description = "Horário atualizado com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Horário não encontrado."),
+            @ApiResponse(responseCode = "400", description = "Conflito de horário.")
     })
     @PutMapping(value = "/{horarioId}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> atualizarHorario(
@@ -123,10 +134,13 @@ public class HorarioDisponivelController {
         }
     }
 
-    @Operation(summary = "Excluir horário disponível", description = "Exclui um horário disponível específico.")
+    @Operation(
+            summary = "Excluir horário disponível",
+            description = "Exclui um horário disponível específico. Requer autenticação via token JWT."
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Horário excluído com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Horário não encontrado")
+            @ApiResponse(responseCode = "204", description = "Horário excluído com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Horário não encontrado.")
     })
     @DeleteMapping("/{horarioId}")
     public ResponseEntity<Void> deletarHorario(
