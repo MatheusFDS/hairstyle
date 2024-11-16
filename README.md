@@ -59,7 +59,7 @@ Este projeto é um sistema completo de agendamento e gerenciamento de serviços 
      ```bash
      docker-compose up
 
-5. Rodar testes (obs: como é a primeira vez ainda não terá usuário por tanto rode duas vezes o comando a abaixo)
+5. Rodar testes (obs: como é a primeira vez que irá rodar o projeto ainda não terá usuário por tanto rode duas vezes o comando a abaixo)
     ```bash
      mvn test
     
