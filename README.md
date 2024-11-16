@@ -53,12 +53,16 @@ Este projeto é um sistema completo de agendamento e gerenciamento de serviços 
       
 3. Construa as imagens do Docker:
     ```bash
-    docker-compose build
+    docker-compose --build
  
 4. Inicie o ambiente:
      ```bash
      docker-compose up
 
+5. Rodar testes (obs: como é a primeira vez que irá rodar o projeto ainda não terá usuário por tanto rode duas vezes o comando a abaixo)
+    ```bash
+     mvn test
+    
 ###  Fluxo de Uso do Sistema
 Para utilizar o sistema, siga a sequência abaixo usando a documentação Swagger disponível em http://localhost:8080/swagger-ui/index.html#:
 1. **cria um usuário:**
@@ -166,4 +170,4 @@ Para utilizar o sistema, siga a sequência abaixo usando a documentação Swagge
         Endpoint: GET /api/estabelecimentos/filtros
         Parâmetros opcionais: nome, endereco, precoMin, precoMax, servico, avaliacaoMinima
 ```
-**para rodar os testes use o comando mvn test com a aplicação main rodando**
+
