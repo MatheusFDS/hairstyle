@@ -62,7 +62,15 @@ Este projeto é um sistema completo de agendamento e gerenciamento de serviços 
 5. Rodar testes (obs: como é a primeira vez que irá rodar o projeto ainda não terá usuário por tanto rode duas vezes o comando a abaixo)
     ```bash
      mvn test
-    
+   
+6. Caso tenha o banco de dados postgres intalado ou no docker já rodando na porta 5432 você pode usar os seguintes comandos para rodar a aplicação: 
+   ```bash
+      mvn spring-boot:run
+   
+7. ou criar o ponto jar e execulta-lo
+   ```bash
+    mvn clean package -DskipTests
+
 ###  Fluxo de Uso do Sistema
 Para utilizar o sistema, siga a sequência abaixo usando a documentação Swagger disponível em http://localhost:8080/swagger-ui/index.html#:
 1. **cria um usuário:**
