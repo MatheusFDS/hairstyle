@@ -30,7 +30,7 @@ Este projeto é um sistema completo de agendamento e gerenciamento de serviços 
     - Painel de controle para reagendamentos, cancelamentos e ajustes na agenda.
 
 9. **Integração com Calendários**:
-    - Suporte para sincronização com Google Calendar (opcional).
+    - Suporte para sincronização com Google Calendar (opcional, precisa das credenciais, coloquei dados fakes, mas se colocarmos dados reais irá funcionar).
 
 ---
 
