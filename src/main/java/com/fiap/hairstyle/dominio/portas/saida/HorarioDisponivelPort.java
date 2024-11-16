@@ -7,4 +7,6 @@ import java.util.UUID;
 
 public interface HorarioDisponivelPort {
     List<HorarioDisponivel> buscarPorProfissionalId(UUID profissionalId);
+
+    void salvarTodos(List<HorarioDisponivel> horarios); // Adiciona este método
 }

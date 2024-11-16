@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.adaptadores.saida.adpter;
+package com.fiap.hairstyle.adaptadores.saida.adapter;
 
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
 import com.fiap.hairstyle.dominio.portas.saida.NotificacaoPort;

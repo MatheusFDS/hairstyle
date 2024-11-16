@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.adaptadores.saida.adpter;
+package com.fiap.hairstyle.adaptadores.saida.adapter;
 
 import com.fiap.hairstyle.adaptadores.saida.repositorios.AvaliacaoRepository;
 import com.fiap.hairstyle.dominio.entidades.Avaliacao;

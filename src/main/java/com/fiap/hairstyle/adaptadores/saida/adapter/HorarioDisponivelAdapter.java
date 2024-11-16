@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.adaptadores.saida.adpter;
+package com.fiap.hairstyle.adaptadores.saida.adapter;
 
 import com.fiap.hairstyle.adaptadores.saida.repositorios.HorarioDisponivelRepository;
 import com.fiap.hairstyle.dominio.entidades.HorarioDisponivel;
@@ -20,5 +20,10 @@ public class HorarioDisponivelAdapter implements HorarioDisponivelPort {
     @Override
     public List<HorarioDisponivel> buscarPorProfissionalId(UUID profissionalId) {
         return horarioDisponivelRepository.findByProfissionalId(profissionalId);
+    }
+
+    @Override
+    public void salvarTodos(List<HorarioDisponivel> horarios) {
+        horarioDisponivelRepository.saveAll(horarios);
     }
 }
