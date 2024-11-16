@@ -78,26 +78,27 @@ Para utilizar o sistema, siga a sequência abaixo usando a documentação Swagge
     Endpoint: POST /api/estabelecimentos
     Criar um profissional (com o token):
 
-Endpoint: POST /api/profissionais
-Criar um serviço (com o token):
-
-Endpoint: POST /api/servicos
-Criar um cliente:
-
-Endpoint: POST /api/clientes
-Criar disponibilidade para os profissionais (com o token):
-
-Endpoint: POST /api/horarios-disponiveis/profissional/{id}
-Criar um agendamento (com o token):
-
-Endpoint: POST /api/agendamentos
-Avaliar o estabelecimento ou profissional (com o token):
-
-Endpoint para avaliar profissional: POST /api/avaliacoes/profissional/{agendamentoId}
-Endpoint para avaliar estabelecimento: POST /api/avaliacoes/estabelecimento/{agendamentoId}
-Realizar buscas avançadas dos estabelecimentos:
-
-Endpoint: GET /api/estabelecimentos/filtros
-Parâmetros opcionais: nome, endereco, precoMin, precoMax, servico, avaliacaoMinima
-
+```bash
+        Endpoint: POST /api/profissionais
+        Criar um serviço (com o token):
+        
+        Endpoint: POST /api/servicos
+        Criar um cliente:
+        
+        Endpoint: POST /api/clientes
+        Criar disponibilidade para os profissionais (com o token):
+        
+        Endpoint: POST /api/horarios-disponiveis/profissional/{id}
+        Criar um agendamento (com o token):
+        
+        Endpoint: POST /api/agendamentos
+        Avaliar o estabelecimento ou profissional (com o token):
+        
+        Endpoint para avaliar profissional: POST /api/avaliacoes/profissional/{agendamentoId}
+        Endpoint para avaliar estabelecimento: POST /api/avaliacoes/estabelecimento/{agendamentoId}
+        Realizar buscas avançadas dos estabelecimentos:
+        
+        Endpoint: GET /api/estabelecimentos/filtros
+        Parâmetros opcionais: nome, endereco, precoMin, precoMax, servico, avaliacaoMinima
+```
 **para rodar os testes use o comando mvn test com a aplicação main rodando**
