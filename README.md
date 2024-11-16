@@ -45,7 +45,7 @@ Este projeto é um sistema completo de agendamento e gerenciamento de serviços 
 0. O app está na nuvem juntamente com o banco de dados basta seguir os passos abaixo alterando para o ip:
     ```bash
    http://34.230.19.130:8080
-   http://34.230.19.130:8080/swagger-ui/index.html#
+   http://34.230.19.130:8080/swagger-ui/index.html# (obs: não faça as chamdas na nuvem via swagger pois o cors irá bloquear, faça cia curl ou postman, caso queira rodar pelo swagger faça localmente)
    
 
 1. Clone o repositório:
