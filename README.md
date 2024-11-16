@@ -42,6 +42,11 @@ Este projeto é um sistema completo de agendamento e gerenciamento de serviços 
 - **Docker** instalado na máquina
 
 ### Passos
+0. O app está na nuvem juntamente com o banco de dados basta seguir os passos abaixo alterando para o ip:
+    ```bash
+   http://34.230.19.130:8080
+   http://34.230.19.130:8080/swagger-ui/index.html#
+   
 
 1. Clone o repositório:
    ```bash
