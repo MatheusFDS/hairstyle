@@ -1,6 +1,7 @@
 package com.fiap.hairstyle.dominio.entidades;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,16 +21,16 @@ public class Avaliacao {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnore
     private Cliente cliente;
 
     @ManyToOne
     @JoinColumn(name = "profissional_id", nullable = true)
-    @JsonBackReference
+    @JsonIgnore
     private Profissional profissional;
 
     @ManyToOne
     @JoinColumn(name = "estabelecimento_id", nullable = true)
-    @JsonBackReference
+    @JsonIgnore
     private Estabelecimento estabelecimento;
 }

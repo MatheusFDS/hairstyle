@@ -1,14 +1,13 @@
 package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
 import com.fiap.hairstyle.dominio.entidades.Cliente;
-import com.fiap.hairstyle.adaptadores.saida.repositorios.ClienteRepository;
+import com.fiap.hairstyle.aplicacao.casosdeuso.cliente.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,66 +21,58 @@ import java.util.UUID;
 @SecurityRequirement(name = "Bearer Authentication")
 public class ClienteController {
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    private final ListarClientesUseCase listarClientesUseCase;
+    private final BuscarClientePorIdUseCase buscarClientePorIdUseCase;
+    private final CriarClienteUseCase criarClienteUseCase;
+    private final AtualizarClienteUseCase atualizarClienteUseCase;
+    private final DeletarClienteUseCase deletarClienteUseCase;
 
-    @Operation(summary = "Listar todos os clientes", description = "Retorna uma lista com todos os clientes cadastrados no sistema. Requer autenticação com token.")
-    @ApiResponse(responseCode = "200", description = "Lista de clientes retornada com sucesso.")
-    @GetMapping(produces = "application/json")
+    public ClienteController(ListarClientesUseCase listarClientesUseCase,
+                             BuscarClientePorIdUseCase buscarClientePorIdUseCase,
+                             CriarClienteUseCase criarClienteUseCase,
+                             AtualizarClienteUseCase atualizarClienteUseCase,
+                             DeletarClienteUseCase deletarClienteUseCase) {
+        this.listarClientesUseCase = listarClientesUseCase;
+        this.buscarClientePorIdUseCase = buscarClientePorIdUseCase;
+        this.criarClienteUseCase = criarClienteUseCase;
+        this.atualizarClienteUseCase = atualizarClienteUseCase;
+        this.deletarClienteUseCase = deletarClienteUseCase;
+    }
+
+    @Operation(summary = "Listar todos os clientes")
+    @GetMapping
     public List<Cliente> listarTodos() {
-        return clienteRepository.findAll();
+        return listarClientesUseCase.executar();
     }
 
-    @Operation(summary = "Buscar cliente por ID", description = "Busca um cliente específico pelo seu ID. Requer autenticação com token.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cliente encontrado."),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado.")
-    })
-    @GetMapping(value = "/{id}", produces = "application/json")
-    public ResponseEntity<Cliente> buscarPorId(
-            @Parameter(description = "ID do cliente", required = true) @PathVariable UUID id) {
-        Optional<Cliente> cliente = clienteRepository.findById(id);
-        return cliente.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @Operation(summary = "Buscar cliente por ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<Cliente> buscarPorId(@Parameter(description = "ID do cliente") @PathVariable UUID id) {
+        return buscarClientePorIdUseCase.executar(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Criar novo cliente", description = "Cadastra um novo cliente no sistema. Requer autenticação com token.")
-    @ApiResponse(responseCode = "201", description = "Cliente criado com sucesso.")
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public Cliente criar(
-            @Parameter(description = "Dados do cliente a ser criado", required = true) @RequestBody Cliente cliente) {
-        return clienteRepository.save(cliente);
+    @Operation(summary = "Criar novo cliente")
+    @PostMapping
+    public Cliente criar(@RequestBody Cliente cliente) {
+        return criarClienteUseCase.executar(cliente);
     }
 
-    @Operation(summary = "Atualizar cliente", description = "Atualiza as informações de um cliente específico. Requer autenticação com token.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso."),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado.")
-    })
-    @PutMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Cliente> atualizar(
-            @Parameter(description = "ID do cliente", required = true) @PathVariable UUID id,
-            @Parameter(description = "Dados do cliente a serem atualizados", required = true) @RequestBody Cliente clienteAtualizado) {
-        return clienteRepository.findById(id).map(cliente -> {
-            cliente.setNome(clienteAtualizado.getNome());
-            cliente.setTelefone(clienteAtualizado.getTelefone());
-            cliente.setEmail(clienteAtualizado.getEmail());
-            return ResponseEntity.ok(clienteRepository.save(cliente));
-        }).orElseGet(() -> ResponseEntity.notFound().build());
+    @Operation(summary = "Atualizar cliente")
+    @PutMapping("/{id}")
+    public ResponseEntity<Cliente> atualizar(@PathVariable UUID id, @RequestBody Cliente clienteAtualizado) {
+        return atualizarClienteUseCase.executar(id, clienteAtualizado)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Deletar cliente", description = "Exclui um cliente específico do sistema. Requer autenticação com token.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Cliente excluído com sucesso."),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado.")
-    })
+    @Operation(summary = "Deletar cliente")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(
-            @Parameter(description = "ID do cliente", required = true) @PathVariable UUID id) {
-        if (clienteRepository.existsById(id)) {
-            clienteRepository.deleteById(id);
+    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
+        if (deletarClienteUseCase.executar(id)) {
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.notFound().build();
     }
 }

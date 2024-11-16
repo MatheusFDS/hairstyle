@@ -1,7 +1,7 @@
 package com.fiap.hairstyle.aplicacao.casosdeuso;
 
-import com.fiap.hairstyle.aplicacao.casosdeuso.CriarAgendamentoCasoDeUsoImpl;
-import com.fiap.hairstyle.aplicacao.portas.saida.AgendamentoSaidaPort;
+import com.fiap.hairstyle.aplicacao.casosdeuso.testes.CriarAgendamentoCasoDeUsoImpl;
+import com.fiap.hairstyle.dominio.portas.saida.AgendamentoSaidaPort;
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
 import com.fiap.hairstyle.dominio.entidades.Cliente;
 import com.fiap.hairstyle.dominio.entidades.Profissional;

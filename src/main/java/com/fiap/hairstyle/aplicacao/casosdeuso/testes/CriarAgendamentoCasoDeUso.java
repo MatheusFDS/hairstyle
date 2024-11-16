@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.aplicacao.casosdeuso;
+package com.fiap.hairstyle.aplicacao.casosdeuso.testes;
 
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
 

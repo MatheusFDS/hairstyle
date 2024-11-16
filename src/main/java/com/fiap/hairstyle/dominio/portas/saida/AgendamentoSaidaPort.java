@@ -1,4 +1,4 @@
-package com.fiap.hairstyle.aplicacao.portas.saida;
+package com.fiap.hairstyle.dominio.portas.saida;
 
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
 import java.time.LocalDateTime;

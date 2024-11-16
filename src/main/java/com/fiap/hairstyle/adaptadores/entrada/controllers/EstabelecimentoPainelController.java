@@ -1,21 +1,18 @@
 package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
 import com.fiap.hairstyle.dominio.entidades.Agendamento;
-import com.fiap.hairstyle.adaptadores.saida.repositorios.AgendamentoRepository;
-import com.fiap.hairstyle.dominio.servico.NotificacaoService;
+import com.fiap.hairstyle.aplicacao.casosdeuso.agendamento.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -24,11 +21,21 @@ import java.util.UUID;
 @SecurityRequirement(name = "Bearer Authentication")
 public class EstabelecimentoPainelController {
 
-    @Autowired
-    private AgendamentoRepository agendamentoRepository;
+    private final ListarAgendamentosPorEstabelecimentoUseCase listarAgendamentosUseCase;
+    private final CancelarAgendamentoUseCase cancelarAgendamentoUseCase;
+    private final ReagendarAgendamentoUseCase reagendarAgendamentoUseCase;
+    private final MarcarNaoComparecimentoUseCase marcarNaoComparecimentoUseCase;
 
-    @Autowired
-    private NotificacaoService notificacaoService;
+    public EstabelecimentoPainelController(
+            ListarAgendamentosPorEstabelecimentoUseCase listarAgendamentosUseCase,
+            CancelarAgendamentoUseCase cancelarAgendamentoUseCase,
+            ReagendarAgendamentoUseCase reagendarAgendamentoUseCase,
+            MarcarNaoComparecimentoUseCase marcarNaoComparecimentoUseCase) {
+        this.listarAgendamentosUseCase = listarAgendamentosUseCase;
+        this.cancelarAgendamentoUseCase = cancelarAgendamentoUseCase;
+        this.reagendarAgendamentoUseCase = reagendarAgendamentoUseCase;
+        this.marcarNaoComparecimentoUseCase = marcarNaoComparecimentoUseCase;
+    }
 
     @Operation(
             summary = "Listar agendamentos",
@@ -38,7 +45,7 @@ public class EstabelecimentoPainelController {
     @GetMapping("/agendamentos")
     public ResponseEntity<List<Agendamento>> listarAgendamentos(
             @Parameter(description = "ID do estabelecimento", required = true) @PathVariable UUID estabelecimentoId) {
-        List<Agendamento> agendamentos = agendamentoRepository.findByEstabelecimentoId(estabelecimentoId);
+        List<Agendamento> agendamentos = listarAgendamentosUseCase.executar(estabelecimentoId);
         return ResponseEntity.ok(agendamentos);
     }
 
@@ -53,14 +60,8 @@ public class EstabelecimentoPainelController {
     @DeleteMapping("/agendamentos/{agendamentoId}")
     public ResponseEntity<Void> cancelarAgendamento(
             @Parameter(description = "ID do agendamento", required = true) @PathVariable UUID agendamentoId) {
-        Optional<Agendamento> agendamento = agendamentoRepository.findById(agendamentoId);
-        if (agendamento.isPresent()) {
-            agendamentoRepository.deleteById(agendamentoId);
-            notificacaoService.enviarCancelamento(agendamento.get());
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        boolean sucesso = cancelarAgendamentoUseCase.executar(agendamentoId);
+        return sucesso ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @Operation(
@@ -75,16 +76,8 @@ public class EstabelecimentoPainelController {
     public ResponseEntity<Agendamento> reagendarAgendamento(
             @Parameter(description = "ID do agendamento", required = true) @PathVariable UUID agendamentoId,
             @Parameter(description = "Nova data e hora para o agendamento", required = true) @RequestBody LocalDateTime novaDataHora) {
-        Optional<Agendamento> agendamentoOpt = agendamentoRepository.findById(agendamentoId);
-        if (agendamentoOpt.isPresent()) {
-            Agendamento agendamento = agendamentoOpt.get();
-            agendamento.setDataHora(novaDataHora);
-            agendamentoRepository.save(agendamento);
-            notificacaoService.enviarConfirmacao(agendamento);
-            return ResponseEntity.ok(agendamento);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        Agendamento agendamento = reagendarAgendamentoUseCase.executar(agendamentoId, novaDataHora);
+        return agendamento != null ? ResponseEntity.ok(agendamento) : ResponseEntity.notFound().build();
     }
 
     @Operation(
@@ -98,15 +91,7 @@ public class EstabelecimentoPainelController {
     @PutMapping("/agendamentos/{agendamentoId}/naoComparecimento")
     public ResponseEntity<Agendamento> marcarNaoComparecimento(
             @Parameter(description = "ID do agendamento", required = true) @PathVariable UUID agendamentoId) {
-        Optional<Agendamento> agendamentoOpt = agendamentoRepository.findById(agendamentoId);
-        if (agendamentoOpt.isPresent()) {
-            Agendamento agendamento = agendamentoOpt.get();
-            agendamento.setNaoComparecimento(true);
-            agendamentoRepository.save(agendamento);
-            notificacaoService.enviarNaoComparecimento(agendamento);
-            return ResponseEntity.ok(agendamento);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        Agendamento agendamento = marcarNaoComparecimentoUseCase.executar(agendamentoId);
+        return agendamento != null ? ResponseEntity.ok(agendamento) : ResponseEntity.notFound().build();
     }
 }

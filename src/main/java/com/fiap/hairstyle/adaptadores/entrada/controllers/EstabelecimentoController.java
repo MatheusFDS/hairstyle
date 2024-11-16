@@ -1,14 +1,13 @@
 package com.fiap.hairstyle.adaptadores.entrada.controllers;
 
 import com.fiap.hairstyle.dominio.entidades.Estabelecimento;
-import com.fiap.hairstyle.adaptadores.saida.repositorios.EstabelecimentoRepository;
+import com.fiap.hairstyle.aplicacao.casosdeuso.estabelecimento.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,21 +21,38 @@ import java.util.UUID;
 @SecurityRequirement(name = "Bearer Authentication")
 public class EstabelecimentoController {
 
-    @Autowired
-    private EstabelecimentoRepository estabelecimentoRepository;
+    private final ListarEstabelecimentosUseCase listarEstabelecimentosUseCase;
+    private final BuscarEstabelecimentoPorIdUseCase buscarEstabelecimentoPorIdUseCase;
+    private final CriarEstabelecimentoUseCase criarEstabelecimentoUseCase;
+    private final AtualizarEstabelecimentoUseCase atualizarEstabelecimentoUseCase;
+    private final DeletarEstabelecimentoUseCase deletarEstabelecimentoUseCase;
+    private final FiltrarEstabelecimentosUseCase filtrarEstabelecimentosUseCase;
 
-    @Operation(summary = "Listar todos os estabelecimentos",
-            description = "Retorna uma lista de todos os estabelecimentos cadastrados. É necessário autenticação via token JWT.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso.")
-    })
-    @GetMapping
-    public List<Estabelecimento> listarTodos() {
-        return estabelecimentoRepository.findAll();
+    public EstabelecimentoController(
+            ListarEstabelecimentosUseCase listarEstabelecimentosUseCase,
+            BuscarEstabelecimentoPorIdUseCase buscarEstabelecimentoPorIdUseCase,
+            CriarEstabelecimentoUseCase criarEstabelecimentoUseCase,
+            AtualizarEstabelecimentoUseCase atualizarEstabelecimentoUseCase,
+            DeletarEstabelecimentoUseCase deletarEstabelecimentoUseCase,
+            FiltrarEstabelecimentosUseCase filtrarEstabelecimentosUseCase
+    ) {
+        this.listarEstabelecimentosUseCase = listarEstabelecimentosUseCase;
+        this.buscarEstabelecimentoPorIdUseCase = buscarEstabelecimentoPorIdUseCase;
+        this.criarEstabelecimentoUseCase = criarEstabelecimentoUseCase;
+        this.atualizarEstabelecimentoUseCase = atualizarEstabelecimentoUseCase;
+        this.deletarEstabelecimentoUseCase = deletarEstabelecimentoUseCase;
+        this.filtrarEstabelecimentosUseCase = filtrarEstabelecimentosUseCase;
     }
 
-    @Operation(summary = "Buscar estabelecimento por ID",
-            description = "Busca os detalhes de um estabelecimento específico pelo seu ID. É necessário autenticação via token JWT.")
+    @Operation(summary = "Listar todos os estabelecimentos", description = "Retorna uma lista de todos os estabelecimentos cadastrados.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lista retornada com sucesso.")})
+    @GetMapping
+    public ResponseEntity<List<Estabelecimento>> listarTodos() {
+        List<Estabelecimento> estabelecimentos = listarEstabelecimentosUseCase.executar();
+        return ResponseEntity.ok(estabelecimentos);
+    }
+
+    @Operation(summary = "Buscar estabelecimento por ID", description = "Busca os detalhes de um estabelecimento específico pelo seu ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Estabelecimento encontrado."),
             @ApiResponse(responseCode = "404", description = "Estabelecimento não encontrado.")
@@ -44,29 +60,23 @@ public class EstabelecimentoController {
     @GetMapping("/{id}")
     public ResponseEntity<Estabelecimento> buscarPorId(
             @Parameter(description = "ID do estabelecimento a ser buscado", required = true) @PathVariable UUID id) {
-        Optional<Estabelecimento> estabelecimento = estabelecimentoRepository.findById(id);
+        Optional<Estabelecimento> estabelecimento = buscarEstabelecimentoPorIdUseCase.executar(id);
         return estabelecimento.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Criar novo estabelecimento",
-            description = "Cadastra um novo estabelecimento no sistema. Relacionamentos como profissionais, serviços e avaliações serão ignorados. É necessário autenticação via token JWT.")
+    @Operation(summary = "Criar novo estabelecimento", description = "Cadastra um novo estabelecimento no sistema.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Estabelecimento criado com sucesso."),
+            @ApiResponse(responseCode = "201", description = "Estabelecimento criado com sucesso."),
             @ApiResponse(responseCode = "400", description = "Erro ao criar o estabelecimento.")
     })
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<Estabelecimento> criar(
             @Parameter(description = "Dados do estabelecimento a ser criado", required = true) @RequestBody Estabelecimento estabelecimento) {
-        estabelecimento.setProfissionais(List.of());
-        estabelecimento.setServicos(List.of());
-        estabelecimento.setAvaliacoes(List.of());
-
-        Estabelecimento novoEstabelecimento = estabelecimentoRepository.save(estabelecimento);
-        return ResponseEntity.ok(novoEstabelecimento);
+        Estabelecimento novoEstabelecimento = criarEstabelecimentoUseCase.executar(estabelecimento);
+        return ResponseEntity.status(201).body(novoEstabelecimento);
     }
 
-    @Operation(summary = "Atualizar um estabelecimento",
-            description = "Atualiza os dados de um estabelecimento existente. É necessário autenticação via token JWT.")
+    @Operation(summary = "Atualizar um estabelecimento", description = "Atualiza os dados de um estabelecimento existente.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Estabelecimento atualizado com sucesso."),
             @ApiResponse(responseCode = "404", description = "Estabelecimento não encontrado.")
@@ -75,19 +85,11 @@ public class EstabelecimentoController {
     public ResponseEntity<Estabelecimento> atualizar(
             @Parameter(description = "ID do estabelecimento a ser atualizado", required = true) @PathVariable UUID id,
             @Parameter(description = "Dados atualizados do estabelecimento", required = true) @RequestBody Estabelecimento estabelecimentoAtualizado) {
-        return estabelecimentoRepository.findById(id).map(estabelecimento -> {
-            estabelecimento.setNome(estabelecimentoAtualizado.getNome());
-            estabelecimento.setEndereco(estabelecimentoAtualizado.getEndereco());
-            estabelecimento.setServicos(estabelecimentoAtualizado.getServicos());
-            estabelecimento.setProfissionais(estabelecimentoAtualizado.getProfissionais());
-            estabelecimento.setHorariosFuncionamento(estabelecimentoAtualizado.getHorariosFuncionamento());
-            estabelecimento.setFotos(estabelecimentoAtualizado.getFotos());
-            return ResponseEntity.ok(estabelecimentoRepository.save(estabelecimento));
-        }).orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<Estabelecimento> estabelecimento = atualizarEstabelecimentoUseCase.executar(id, estabelecimentoAtualizado);
+        return estabelecimento.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Deletar um estabelecimento",
-            description = "Exclui um estabelecimento do sistema pelo seu ID. É necessário autenticação via token JWT.")
+    @Operation(summary = "Deletar um estabelecimento", description = "Exclui um estabelecimento do sistema pelo seu ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Estabelecimento deletado com sucesso."),
             @ApiResponse(responseCode = "404", description = "Estabelecimento não encontrado.")
@@ -95,30 +97,21 @@ public class EstabelecimentoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(
             @Parameter(description = "ID do estabelecimento a ser deletado", required = true) @PathVariable UUID id) {
-        if (estabelecimentoRepository.existsById(id)) {
-            estabelecimentoRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        boolean deletado = deletarEstabelecimentoUseCase.executar(id);
+        return deletado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
-    @Operation(summary = "Filtrar estabelecimentos",
-            description = "Permite buscar estabelecimentos por filtros como nome, endereço, faixa de preço, serviço ou avaliação mínima. É necessário autenticação via token JWT.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de estabelecimentos retornada com sucesso."),
-            @ApiResponse(responseCode = "400", description = "Parâmetros de filtro inválidos.")
-    })
+    @Operation(summary = "Filtrar estabelecimentos", description = "Busca estabelecimentos com base em filtros.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lista de estabelecimentos retornada com sucesso.")})
     @GetMapping("/filtros")
     public ResponseEntity<List<Estabelecimento>> filtrarEstabelecimentos(
-            @Parameter(description = "Filtrar por nome do estabelecimento") @RequestParam(required = false) String nome,
-            @Parameter(description = "Filtrar por endereço do estabelecimento") @RequestParam(required = false) String endereco,
-            @Parameter(description = "Faixa mínima de preço dos serviços") @RequestParam(required = false) Double precoMin,
-            @Parameter(description = "Faixa máxima de preço dos serviços") @RequestParam(required = false) Double precoMax,
-            @Parameter(description = "Filtrar por serviço oferecido") @RequestParam(required = false) String servico,
+            @Parameter(description = "Nome do estabelecimento") @RequestParam(required = false) String nome,
+            @Parameter(description = "Endereço do estabelecimento") @RequestParam(required = false) String endereco,
+            @Parameter(description = "Faixa mínima de preço") @RequestParam(required = false) Double precoMin,
+            @Parameter(description = "Faixa máxima de preço") @RequestParam(required = false) Double precoMax,
+            @Parameter(description = "Serviço oferecido") @RequestParam(required = false) String servico,
             @Parameter(description = "Nota mínima de avaliação") @RequestParam(required = false) Double avaliacaoMinima) {
-        List<Estabelecimento> estabelecimentos = estabelecimentoRepository.filtrarEstabelecimentos(
-                nome, endereco, precoMin, precoMax, servico, avaliacaoMinima);
+        List<Estabelecimento> estabelecimentos = filtrarEstabelecimentosUseCase.executar(nome, endereco, precoMin, precoMax, servico, avaliacaoMinima);
         return ResponseEntity.ok(estabelecimentos);
     }
 }
