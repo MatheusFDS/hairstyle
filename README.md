@@ -64,7 +64,7 @@ Para utilizar o sistema, siga a sequência abaixo usando a documentação Swagge
      "role": "ROLE_ADMIN"
      }
   
-2. **cria um usuário:**
+2. **logar com um usuário:**
    - Endpoint: POST /api/auth/login
        ```bash
      {
@@ -99,3 +99,5 @@ Realizar buscas avançadas dos estabelecimentos:
 
 Endpoint: GET /api/estabelecimentos/filtros
 Parâmetros opcionais: nome, endereco, precoMin, precoMax, servico, avaliacaoMinima
+
+**para rodar os testes use o comando mvn test com a aplicação main rodando**
