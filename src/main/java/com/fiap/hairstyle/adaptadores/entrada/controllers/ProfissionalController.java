@@ -145,4 +145,21 @@ public class ProfissionalController {
         List<HorarioDisponivel> disponibilidade = horarioDisponivelRepository.findByProfissionalId(id);
         return ResponseEntity.ok(disponibilidade);
     }
+
+    @Operation(summary = "Deletar profissional",
+            description = "Exclui um profissional do sistema pelo seu ID. Requer autenticação via token JWT.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Profissional deletado com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Profissional não encontrado.")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(
+            @Parameter(description = "ID do profissional", required = true) @PathVariable UUID id) {
+        if (profissionalRepository.existsById(id)) {
+            profissionalRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

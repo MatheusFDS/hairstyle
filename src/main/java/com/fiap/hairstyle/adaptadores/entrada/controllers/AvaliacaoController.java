@@ -122,4 +122,46 @@ public class AvaliacaoController {
         List<Avaliacao> avaliacoes = avaliacaoRepository.findByEstabelecimentoId(estabelecimentoId);
         return ResponseEntity.ok(avaliacoes);
     }
+
+    @Operation(
+            summary = "Atualizar uma avaliação",
+            description = "Permite atualizar os detalhes de uma avaliação existente. Requer autenticação via token JWT."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Avaliação atualizada com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Avaliação não encontrada.")
+    })
+    @PutMapping("/{avaliacaoId}")
+    public ResponseEntity<?> atualizarAvaliacao(
+            @Parameter(description = "ID da avaliação", required = true) @PathVariable UUID avaliacaoId,
+            @Valid @RequestBody Avaliacao avaliacaoAtualizada) {
+
+        return avaliacaoRepository.findById(avaliacaoId).map(avaliacao -> {
+            avaliacao.setNota(avaliacaoAtualizada.getNota());
+            avaliacao.setComentario(avaliacaoAtualizada.getComentario());
+
+            Avaliacao avaliacaoSalva = avaliacaoRepository.save(avaliacao);
+            return ResponseEntity.ok(avaliacaoSalva);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Operation(
+            summary = "Deletar uma avaliação",
+            description = "Exclui uma avaliação do sistema. Requer autenticação via token JWT."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Avaliação deletada com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Avaliação não encontrada.")
+    })
+    @DeleteMapping("/{avaliacaoId}")
+    public ResponseEntity<Void> deletarAvaliacao(
+            @Parameter(description = "ID da avaliação", required = true) @PathVariable UUID avaliacaoId) {
+
+        if (avaliacaoRepository.existsById(avaliacaoId)) {
+            avaliacaoRepository.deleteById(avaliacaoId);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
